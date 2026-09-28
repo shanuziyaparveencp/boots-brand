@@ -12,8 +12,8 @@ export default function Cart() {
       <div className="container-site py-24 text-center sm:py-32">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Your Cart</h1>
         <p className="mt-4 text-sm text-ink/60">Your cart is empty.</p>
-        <Link to="/boots" className="btn-primary mt-8">
-          Shop Boots
+        <Link to="/shop" className="btn-primary mt-8">
+          Start Shopping
         </Link>
       </div>
     );
@@ -70,7 +70,7 @@ export default function Cart() {
             </button>
 
             <Link
-              to="/boots"
+              to="/shop"
               className="mt-4 block text-center text-xs uppercase tracking-[0.14em] text-ink/60 transition-colors hover:text-ink"
             >
               Continue Shopping
@@ -81,3 +81,4 @@ export default function Cart() {
     </div>
   );
 }
+

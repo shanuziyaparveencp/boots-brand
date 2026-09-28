@@ -30,7 +30,7 @@ export default function ProductFilters({
             className={cn(
               'shrink-0 px-3.5 py-2 text-xs font-medium uppercase tracking-[0.1em] transition-colors',
               activeFilter === filter.id
-                ? 'bg-ink text-cream'
+                ? 'bg-brand text-cream'
                 : 'text-ink/55 hover:text-ink',
             )}
           >
@@ -41,7 +41,7 @@ export default function ProductFilters({
 
       <div className="flex items-center justify-between gap-5 md:justify-end">
         <span className="text-xs text-stone">
-          {resultCount} {resultCount === 1 ? 'style' : 'styles'}
+          {resultCount} {resultCount === 1 ? 'item' : 'items'}
         </span>
 
         <div className="relative">

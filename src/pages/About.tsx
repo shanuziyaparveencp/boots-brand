@@ -5,13 +5,13 @@ export default function About() {
     <div>
       <section className="container-site py-16 sm:py-24">
         <div className="max-w-2xl">
-          <p className="eyebrow mb-4">About Northbound</p>
+          <p className="eyebrow mb-4">About Boots Hyper Market</p>
           <h1 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
             Built with purpose. Made to last.
           </h1>
           <p className="mt-6 text-base leading-relaxed text-ink/65">
-            We make a small range of boots in materials we can stand behind, for people who would
-            rather own one good pair than replace a cheap one every winter.
+            A family-run shop stocking footwear, bags and travel trolleys for every member of the
+            household - in the same neighbourhood since 1980.
           </p>
         </div>
       </section>
@@ -20,8 +20,8 @@ export default function About() {
         <div className="grid gap-5 sm:grid-cols-3 sm:gap-6">
           <div className="bg-sand sm:col-span-2">
             <img
-              src="/images/about/workshop.jpg"
-              alt="A pair of brown leather boots resting on a wooden floor"
+              src="/images/about/heritage.jpg"
+              alt="A stack of travel cases"
               width={1200}
               height={900}
               className="aspect-[16/10] w-full object-cover sm:aspect-[16/11]"
@@ -29,8 +29,8 @@ export default function About() {
           </div>
           <div className="bg-sand">
             <img
-              src="/images/about/lifestyle.jpg"
-              alt="A well-worn pair of tan leather boots"
+              src="/images/about/range.jpg"
+              alt="An open suitcase packed for a trip"
               width={1200}
               height={900}
               loading="lazy"
@@ -46,14 +46,14 @@ export default function About() {
             <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Our Story</h2>
             <div className="mt-5 space-y-4 text-sm leading-relaxed text-ink/65">
               <p>
-                Northbound began in 2019 in a small workshop, repairing boots that had been thrown
-                away far too early. Seeing the same failures again and again — split seams, glued
-                soles, linings that wore through in a season — told us exactly what to build
-                differently.
+                We opened in 1980 as a single footwear counter. The range grew the way most family
+                shops grow - customers asked for something we did not stock, and if enough people
+                asked, we found a supplier and made space on the shelf.
               </p>
               <p>
-                We started with one lace-up boot and sold it to people we knew. It is still in the
-                collection today, largely unchanged.
+                Bags came first, then school trolleys, then a full travel range. Three departments
+                later, we are still on the same street, often serving the children of our first
+                customers.
               </p>
             </div>
           </div>
@@ -62,13 +62,13 @@ export default function About() {
             <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Our Philosophy</h2>
             <div className="mt-5 space-y-4 text-sm leading-relaxed text-ink/65">
               <p>
-                We keep the range deliberately small. Fewer styles means we can spend longer on each
-                one — the shape of the last, the weight of the leather, where the stitching needs
-                reinforcing.
+                We would rather stock fewer things well than fill the shop with everything. Each
+                line is chosen by someone who has handled it, checked the stitching and asked what
+                happens when it wears out.
               </p>
               <p>
-                Nothing here is designed to expire. We avoid seasonal colours and hardware that
-                dates, so a pair bought this year still looks right in five.
+                Prices stay honest because we expect you back next season. That has been the whole
+                business plan since 1980.
               </p>
             </div>
           </div>
@@ -83,21 +83,21 @@ export default function About() {
             </h2>
             <div className="mt-5 space-y-4 text-sm leading-relaxed text-ink/65">
               <p>
-                Every pair is built on a welted construction, which means the sole is stitched
-                rather than glued — and can be replaced when it finally wears down.
+                In footwear we look for welted or properly cemented soles, full-grain leather where
+                it matters, and linings that survive a full season of daily wear.
               </p>
               <p>
-                We use full-grain leather because it ages well: it takes on the shape of your foot
-                and develops a patina instead of cracking. Hardware is solid brass or steel, chosen
-                so it does not fail before the upper does.
+                In bags and trolleys we check the parts that fail first: zips, wheels, handles and
+                seams. A trolley is only as good as its wheels, so those are the first thing we
+                test.
               </p>
               <p>
-                Each boot is checked by hand before it is boxed. If something is not right, it does
-                not ship.
+                If something does go wrong, bring it in. We would rather repair or exchange it than
+                lose a customer over it.
               </p>
             </div>
-            <Link to="/boots" className="btn-secondary mt-8">
-              Shop the Collection
+            <Link to="/shop" className="btn-secondary mt-8">
+              Shop the Range
             </Link>
           </div>
 

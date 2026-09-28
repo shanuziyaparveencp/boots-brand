@@ -3,15 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
 import { products } from '../data/products';
-import {
-  categoryFilters,
-  isFilterId,
-  isSortId,
-  sortProducts,
-} from '../data/filters';
+import { categoryFilters, isFilterId, isSortId, sortProducts } from '../data/filters';
 import type { FilterId, SortId } from '../data/filters';
 
-export default function Boots() {
+export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filterParam = searchParams.get('filter');
@@ -31,7 +26,9 @@ export default function Boots() {
         term.length === 0 ||
         product.name.toLowerCase().includes(term) ||
         product.description.toLowerCase().includes(term) ||
-        product.material.toLowerCase().includes(term);
+        product.material.toLowerCase().includes(term) ||
+        product.category.toLowerCase().includes(term) ||
+        product.department.toLowerCase().includes(term);
       return matchesCategory && matchesQuery;
     });
 
@@ -53,10 +50,10 @@ export default function Boots() {
   return (
     <div className="container-site py-14 sm:py-20">
       <header className="max-w-xl">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Boots</h1>
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Shop</h1>
         <p className="mt-4 text-sm leading-relaxed text-ink/60">
-          A small, considered collection — leather lace-ups, Chelsea boots, work boots and trail
-          boots, all built to be worn hard and kept for years.
+          Everything we stock in one place — boots, sneakers, formal shoes and sandals, alongside
+          backpacks, handbags and a full range of travel trolleys.
         </p>
       </header>
 
@@ -87,7 +84,7 @@ export default function Boots() {
         <ProductGrid products={visibleProducts} className="mt-12" />
       ) : (
         <div className="py-24 text-center">
-          <p className="text-sm text-ink/60">No boots match this selection.</p>
+          <p className="text-sm text-ink/60">Nothing matches this selection.</p>
           <button
             type="button"
             onClick={() => setSearchParams({}, { replace: true })}

@@ -4,6 +4,10 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Brand maroon, sampled from the Boots Hyper Market logo.
+        brand: '#4E0A0C',
+        'brand-dark': '#3A0203',
+        'brand-light': '#6E1A1E',
         ink: '#12110F',
         cream: '#F7F4EF',
         sand: '#EFE9E0',

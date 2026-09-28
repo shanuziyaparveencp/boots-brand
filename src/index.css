@@ -14,7 +14,7 @@
 
   /* Keyboard focus stays visible; pointer clicks stay quiet. */
   :focus-visible {
-    @apply outline-none ring-2 ring-ink ring-offset-2 ring-offset-cream;
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-cream;
   }
 }
 
@@ -30,15 +30,15 @@
   }
 
   .btn-primary {
-    @apply btn bg-ink text-cream hover:bg-clay;
+    @apply btn bg-brand text-cream hover:bg-brand-light;
   }
 
   .btn-secondary {
-    @apply btn border border-ink/30 text-ink hover:border-ink hover:bg-ink hover:text-cream;
+    @apply btn border border-brand/30 text-brand hover:border-brand hover:bg-brand hover:text-cream;
   }
 
   .btn-light {
-    @apply btn bg-cream text-ink hover:bg-beige;
+    @apply btn bg-cream text-brand hover:bg-beige;
   }
 
   .eyebrow {
@@ -51,6 +51,6 @@
 
   .field-input {
     @apply w-full border border-ink/15 bg-white px-4 py-3 text-sm text-ink
-      placeholder:text-stone/70 focus:border-ink focus:outline-none;
+      placeholder:text-stone/70 focus:border-brand focus:outline-none;
   }
 }

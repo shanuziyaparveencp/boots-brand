@@ -68,14 +68,14 @@ export default function Contact() {
   }
 
   const fieldClass = (field: keyof FormValues) =>
-    cn('field-input', errors[field] && 'border-red-600 focus:border-red-600');
+    cn('field-input', errors[field] && 'border-brand focus:border-brand');
 
   return (
     <div className="container-site py-14 sm:py-20">
       <header className="max-w-xl">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Get in Touch</h1>
         <p className="mt-4 text-sm leading-relaxed text-ink/60">
-          Questions about sizing, an order or a repair? Send us a message and we will get back to
+          Questions about sizing, stock or an order? Send us a message and we will get back to
           you within two business days.
         </p>
       </header>
@@ -98,7 +98,7 @@ export default function Contact() {
                 aria-describedby={errors.name ? 'name-error' : undefined}
               />
               {errors.name && (
-                <p id="name-error" className="mt-1.5 text-xs text-red-700">
+                <p id="name-error" className="mt-1.5 text-xs text-brand">
                   {errors.name}
                 </p>
               )}
@@ -119,7 +119,7 @@ export default function Contact() {
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
               {errors.email && (
-                <p id="email-error" className="mt-1.5 text-xs text-red-700">
+                <p id="email-error" className="mt-1.5 text-xs text-brand">
                   {errors.email}
                 </p>
               )}
@@ -141,7 +141,7 @@ export default function Contact() {
               aria-describedby={errors.phone ? 'phone-error' : undefined}
             />
             {errors.phone && (
-              <p id="phone-error" className="mt-1.5 text-xs text-red-700">
+              <p id="phone-error" className="mt-1.5 text-xs text-brand">
                 {errors.phone}
               </p>
             )}
@@ -162,7 +162,7 @@ export default function Contact() {
               aria-describedby={errors.message ? 'message-error' : undefined}
             />
             {errors.message && (
-              <p id="message-error" className="mt-1.5 text-xs text-red-700">
+              <p id="message-error" className="mt-1.5 text-xs text-brand">
                 {errors.message}
               </p>
             )}
@@ -178,7 +178,7 @@ export default function Contact() {
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em]">Email</h2>
             <p className="mt-3 flex items-center gap-2.5 text-sm text-ink/70">
               <Mail size={16} strokeWidth={1.6} className="shrink-0 text-stone" />
-              hello@northbound.in
+              hello@bootshypermarket.in
             </p>
           </div>
 
@@ -228,3 +228,4 @@ export default function Contact() {
     </div>
   );
 }
+

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import type { CartLine } from '../context/CartContext';
+import { ONE_SIZE } from '../types/product';
 import { formatPrice } from '../lib/format';
 import QuantityStepper from './QuantityStepper';
 
@@ -12,10 +13,12 @@ interface CartItemProps {
 
 export default function CartItem({ line, onQuantityChange, onRemove }: CartItemProps) {
   const { item, product, lineTotal } = line;
+  const showSize = item.size !== ONE_SIZE;
+  const sizeText = product.department === 'footwear' ? `Size ${item.size}` : item.size;
 
   return (
     <li className="flex gap-4 py-6 sm:gap-6">
-      <Link to={`/boots/${product.slug}`} className="shrink-0 bg-sand">
+      <Link to={`/shop/${product.slug}`} className="shrink-0 bg-sand">
         <img
           src={product.images[0]}
           alt={product.name}
@@ -30,13 +33,14 @@ export default function CartItem({ line, onQuantityChange, onRemove }: CartItemP
         <div className="flex items-start justify-between gap-4">
           <div>
             <Link
-              to={`/boots/${product.slug}`}
-              className="text-sm font-medium text-ink transition-colors hover:text-clay"
+              to={`/shop/${product.slug}`}
+              className="text-sm font-medium text-ink transition-colors hover:text-brand"
             >
               {product.name}
             </Link>
             <p className="mt-1.5 text-xs text-ink/55">
-              Size {item.size} · {item.color}
+              {showSize ? `${sizeText} - ` : ''}
+              {item.color}
             </p>
             <p className="mt-1 text-xs text-ink/55">{formatPrice(product.price)} each</p>
           </div>
@@ -44,7 +48,7 @@ export default function CartItem({ line, onQuantityChange, onRemove }: CartItemP
           <button
             type="button"
             onClick={() => onRemove(item.key)}
-            className="p-1 text-stone transition-colors hover:text-ink"
+            className="p-1 text-stone transition-colors hover:text-brand"
             aria-label={`Remove ${product.name} from cart`}
           >
             <X size={17} strokeWidth={1.6} />

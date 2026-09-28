@@ -1,5 +1,5 @@
 {
-  "name": "northbound-boots",
+  "name": "boots-hyper-market",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -26,3 +26,4 @@
     "vite": "^5.4.10"
   }
 }
+

@@ -1,6 +1,6 @@
-import type { Product } from '../types/product';
+import type { Department, Product } from '../types/product';
 
-export type FilterId = 'all' | 'mens' | 'womens' | 'casual' | 'work';
+export type FilterId = 'all' | 'footwear' | 'bags' | 'trolleys' | 'mens' | 'womens';
 
 export interface CategoryFilter {
   id: FilterId;
@@ -10,26 +10,11 @@ export interface CategoryFilter {
 
 export const categoryFilters: CategoryFilter[] = [
   { id: 'all', label: 'All', match: () => true },
-  {
-    id: 'mens',
-    label: "Men's",
-    match: (product) => product.gender === 'men' || product.gender === 'unisex',
-  },
-  {
-    id: 'womens',
-    label: "Women's",
-    match: (product) => product.gender === 'women' || product.gender === 'unisex',
-  },
-  {
-    id: 'casual',
-    label: 'Casual',
-    match: (product) => product.category === 'casual' || product.category === 'chelsea',
-  },
-  {
-    id: 'work',
-    label: 'Work Boots',
-    match: (product) => product.category === 'work' || product.category === 'hiking',
-  },
+  { id: 'footwear', label: 'Footwear', match: (p) => p.department === 'footwear' },
+  { id: 'bags', label: 'Bags', match: (p) => p.department === 'bags' },
+  { id: 'trolleys', label: 'Trolleys', match: (p) => p.department === 'trolleys' },
+  { id: 'mens', label: "Men's", match: (p) => p.gender === 'men' || p.gender === 'unisex' },
+  { id: 'womens', label: "Women's", match: (p) => p.gender === 'women' || p.gender === 'unisex' },
 ];
 
 export function isFilterId(value: string | null): value is FilterId {
@@ -64,9 +49,33 @@ export function sortProducts(list: Product[], sort: SortId): Product[] {
   }
 }
 
-export const categoryCards: { filter: FilterId; label: string; image: string }[] = [
-  { filter: 'mens', label: "Men's Boots", image: '/images/categories/mens.jpg' },
-  { filter: 'womens', label: "Women's Boots", image: '/images/categories/womens.jpg' },
-  { filter: 'casual', label: 'Casual Boots', image: '/images/categories/casual.jpg' },
-  { filter: 'work', label: 'Work Boots', image: '/images/categories/work.jpg' },
+/** The three departments, shown as image cards on the home page. */
+export const departmentCards: {
+  department: Department;
+  filter: FilterId;
+  label: string;
+  blurb: string;
+  image: string;
+}[] = [
+  {
+    department: 'footwear',
+    filter: 'footwear',
+    label: 'Footwear',
+    blurb: 'Boots, sneakers, formal shoes and sandals',
+    image: '/images/categories/footwear.jpg',
+  },
+  {
+    department: 'bags',
+    filter: 'bags',
+    label: 'Bags',
+    blurb: 'Backpacks, handbags and duffels',
+    image: '/images/categories/bags.jpg',
+  },
+  {
+    department: 'trolleys',
+    filter: 'trolleys',
+    label: 'Trolleys',
+    blurb: 'Cabin, check-in and matching sets',
+    image: '/images/categories/trolleys.jpg',
+  },
 ];

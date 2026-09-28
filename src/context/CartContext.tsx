@@ -1,10 +1,10 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { CartItem } from '../types/cart';
-import type { Product, ProductSize } from '../types/product';
+import type { Product } from '../types/product';
 import { getProductById } from '../data/products';
 
-const STORAGE_KEY = 'northbound.cart.v1';
+const STORAGE_KEY = 'bhm.cart.v1';
 
 export const FREE_SHIPPING_THRESHOLD = 4999;
 export const SHIPPING_FEE = 199;
@@ -22,7 +22,7 @@ export interface CartContextValue {
   subtotal: number;
   shipping: number;
   total: number;
-  addItem: (input: { product: Product; size: ProductSize; color: string; quantity: number }) => void;
+  addItem: (input: { product: Product; size: string; color: string; quantity: number }) => void;
   removeItem: (key: string) => void;
   setQuantity: (key: string, quantity: number) => void;
   clearCart: () => void;
@@ -36,7 +36,7 @@ function isCartItem(value: unknown): value is CartItem {
   return (
     typeof candidate.key === 'string' &&
     typeof candidate.productId === 'string' &&
-    typeof candidate.size === 'number' &&
+    typeof candidate.size === 'string' &&
     typeof candidate.color === 'string' &&
     typeof candidate.quantity === 'number'
   );
@@ -63,7 +63,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch {
-      // Storage can be unavailable (private mode, blocked cookies) — the cart
+      // Storage can be unavailable (private mode, blocked cookies) - the cart
       // still works for the current session.
     }
   }, [items]);
