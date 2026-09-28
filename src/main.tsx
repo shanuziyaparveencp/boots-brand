@@ -1,0 +1,23 @@
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import { CartProvider } from './context/CartContext';
+import './index.css';
+
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error('Root element #root was not found in index.html');
+}
+
+createRoot(container).render(
+  <StrictMode>
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </BrowserRouter>
+  </StrictMode>,
+);

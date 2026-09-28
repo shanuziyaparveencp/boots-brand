@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-cream text-ink antialiased;
+    font-feature-settings: 'kern', 'liga';
+  }
+
+  /* Keyboard focus stays visible; pointer clicks stay quiet. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ink ring-offset-2 ring-offset-cream;
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-site px-5 sm:px-8 lg:px-10;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 text-xs font-semibold
+      uppercase tracking-[0.14em] transition-colors duration-200 disabled:cursor-not-allowed
+      disabled:opacity-40;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-cream hover:bg-clay;
+  }
+
+  .btn-secondary {
+    @apply btn border border-ink/30 text-ink hover:border-ink hover:bg-ink hover:text-cream;
+  }
+
+  .btn-light {
+    @apply btn bg-cream text-ink hover:bg-beige;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.2em] text-stone;
+  }
+
+  .field-label {
+    @apply mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/70;
+  }
+
+  .field-input {
+    @apply w-full border border-ink/15 bg-white px-4 py-3 text-sm text-ink
+      placeholder:text-stone/70 focus:border-ink focus:outline-none;
+  }
+}
