@@ -13,10 +13,12 @@ yarn-error.log*
 *.tsbuildinfo
 vite.config.ts.timestamp-*
 
-# Environment files — never commit secrets
-.env
-.env.*
-!.env.example
-
 # Vercel CLI project link
 .vercel
+
+# Environment files - never commit real secrets.
+# The negation must come last, or the .env* rule above re-ignores it.
+.env
+.env.*
+.env*
+!.env.example

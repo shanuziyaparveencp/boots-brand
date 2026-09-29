@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { shop, storeLocations } from '../data/shop';
 
 const quickLinks = [
   { to: '/', label: 'Home' },
@@ -23,7 +24,7 @@ const supportLinks = [
 const socials = [
   { href: 'https://instagram.com', label: 'Instagram', Icon: Instagram },
   { href: 'https://facebook.com', label: 'Facebook', Icon: Facebook },
-  { href: 'https://wa.me/919800000000', label: 'WhatsApp', Icon: MessageCircle },
+  { href: shop.whatsapp, label: 'WhatsApp', Icon: MessageCircle },
 ];
 
 export default function Footer() {
@@ -42,6 +43,10 @@ export default function Footer() {
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-cream/60">
             Footwear, bags and trolleys for the whole family. Serving our neighbourhood since 1980.
           </p>
+          <p className="mt-4 max-w-xs text-xs leading-relaxed text-cream/45">
+            {storeLocations.join(' · ')}
+          </p>
+          <p className="mt-2 text-xs text-cream/45">{shop.hours}</p>
         </div>
 
         <div>
@@ -119,7 +124,9 @@ export default function Footer() {
           <p className="text-xs text-cream/50">
             © 2026 Boots Hyper Market. All rights reserved.
           </p>
-          <p className="text-xs text-cream/50">hello@bootshypermarket.in · +91 98000 00000</p>
+          <p className="text-xs text-cream/50">
+            {shop.email} · {shop.phoneDisplay}
+          </p>
         </div>
       </div>
     </footer>

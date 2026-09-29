@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
 import CartItem from '../components/CartItem';
 import { useCart } from '../hooks/useCart';
-import { FREE_SHIPPING_THRESHOLD } from '../context/CartContext';
+import { FREE_SHIPPING_THRESHOLD } from '../lib/config';
 import { formatPrice } from '../lib/format';
 
 export default function Cart() {
-  const { lines, itemCount, subtotal, shipping, total, setQuantity, removeItem } = useCart();
+  const { lines, itemCount, subtotal, shipping, total, hasStockProblem, setQuantity, removeItem } =
+    useCart();
 
   if (lines.length === 0) {
     return (
@@ -27,6 +29,17 @@ export default function Cart() {
           {itemCount} {itemCount === 1 ? 'item' : 'items'}
         </span>
       </header>
+
+      {hasStockProblem && (
+        <p
+          role="alert"
+          className="mt-8 flex items-start gap-2.5 border border-brand/30 bg-brand/5 p-4 text-sm text-brand"
+        >
+          <AlertCircle size={17} strokeWidth={1.8} className="mt-0.5 shrink-0" />
+          Some items are no longer available in the quantity you chose. Please reduce them before
+          checking out.
+        </p>
+      )}
 
       <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_20rem] lg:gap-16">
         <ul className="divide-y divide-ink/10 border-y border-ink/10">
@@ -65,9 +78,15 @@ export default function Cart() {
               </p>
             )}
 
-            <button type="button" className="btn-primary mt-6 w-full">
-              Proceed to Checkout
-            </button>
+            {hasStockProblem ? (
+              <button type="button" disabled className="btn-primary mt-6 w-full">
+                Proceed to Checkout
+              </button>
+            ) : (
+              <Link to="/checkout" className="btn-primary mt-6 w-full">
+                Proceed to Checkout
+              </Link>
+            )}
 
             <Link
               to="/shop"
@@ -81,4 +100,3 @@ export default function Cart() {
     </div>
   );
 }
-

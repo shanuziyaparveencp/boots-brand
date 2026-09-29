@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Clock, Facebook, Instagram, Mail, MessageCircle, Phone } from 'lucide-react';
+import { Clock, Facebook, Instagram, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
 import Toast from '../components/Toast';
 import { cn } from '../lib/format';
+import { shop, storeLocations } from '../data/shop';
 
 interface FormValues {
   name: string;
@@ -42,7 +43,7 @@ function validate(values: FormValues): FormErrors {
 const socials = [
   { href: 'https://instagram.com', label: 'Instagram', Icon: Instagram },
   { href: 'https://facebook.com', label: 'Facebook', Icon: Facebook },
-  { href: 'https://wa.me/919800000000', label: 'WhatsApp', Icon: MessageCircle },
+  { href: shop.whatsapp, label: 'WhatsApp', Icon: MessageCircle },
 ];
 
 export default function Contact() {
@@ -178,7 +179,9 @@ export default function Contact() {
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em]">Email</h2>
             <p className="mt-3 flex items-center gap-2.5 text-sm text-ink/70">
               <Mail size={16} strokeWidth={1.6} className="shrink-0 text-stone" />
-              hello@bootshypermarket.in
+              <a href={`mailto:${shop.email}`} className="transition-colors hover:text-brand">
+                {shop.email}
+              </a>
             </p>
           </div>
 
@@ -186,7 +189,9 @@ export default function Contact() {
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em]">Phone</h2>
             <p className="mt-3 flex items-center gap-2.5 text-sm text-ink/70">
               <Phone size={16} strokeWidth={1.6} className="shrink-0 text-stone" />
-              +91 98000 00000
+              <a href={`tel:${shop.phoneRaw}`} className="transition-colors hover:text-brand">
+                {shop.phoneDisplay}
+              </a>
             </p>
           </div>
 
@@ -196,10 +201,17 @@ export default function Contact() {
             </h2>
             <div className="mt-3 flex gap-2.5 text-sm text-ink/70">
               <Clock size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-stone" />
-              <div className="space-y-1">
-                <p>Monday – Friday: 10am – 7pm</p>
-                <p>Saturday: 10am – 4pm</p>
-                <p>Sunday: Closed</p>
+              <p>{shop.hours}</p>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em]">Our Shops</h2>
+            <div className="mt-3 flex gap-2.5 text-sm text-ink/70">
+              <MapPin size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-stone" />
+              <div>
+                <p>{storeLocations.join(' · ')}</p>
+                <p className="mt-1 text-ink/50">{shop.district}</p>
               </div>
             </div>
           </div>

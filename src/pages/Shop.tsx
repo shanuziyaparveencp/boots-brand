@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
-import { products } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
 import { categoryFilters, isFilterId, isSortId, sortProducts } from '../data/filters';
 import type { FilterId, SortId } from '../data/filters';
 
 export default function Shop() {
+  const { products, loading } = useCatalog();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filterParam = searchParams.get('filter');
@@ -33,7 +34,7 @@ export default function Shop() {
     });
 
     return sortProducts(filtered, activeSort);
-  }, [activeFilter, activeSort, query]);
+  }, [products, activeFilter, activeSort, query]);
 
   function updateParams(next: Partial<Record<'filter' | 'sort' | 'q', string>>) {
     const params = new URLSearchParams(searchParams);
@@ -82,6 +83,8 @@ export default function Shop() {
 
       {visibleProducts.length > 0 ? (
         <ProductGrid products={visibleProducts} className="mt-12" />
+      ) : loading ? (
+        <p className="py-24 text-center text-sm text-ink/50">Loading products…</p>
       ) : (
         <div className="py-24 text-center">
           <p className="text-sm text-ink/60">Nothing matches this selection.</p>

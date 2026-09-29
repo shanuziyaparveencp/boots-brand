@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Award, PackageCheck, ShieldCheck, Store } from 'lucide-react';
 import SectionHeading from '../components/SectionHeading';
 import ProductGrid from '../components/ProductGrid';
-import { getFeaturedProducts } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
 import { departmentCards } from '../data/filters';
 
 const features = [
@@ -29,7 +29,11 @@ const features = [
 ];
 
 export default function Home() {
-  const featured = getFeaturedProducts(8);
+  const { products } = useCatalog();
+  // Featured first, then whatever else fills the row.
+  const featured = [...products]
+    .sort((a, b) => Number(b.featured) - Number(a.featured))
+    .slice(0, 8);
 
   return (
     <>

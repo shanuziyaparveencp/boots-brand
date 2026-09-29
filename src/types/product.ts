@@ -46,6 +46,11 @@ export interface Product {
   material: string;
   care: string;
   featured: boolean;
+  /**
+   * Units available. Undefined means stock is not tracked for this product
+   * (the bundled fallback catalogue), in which case quantity is uncapped.
+   */
+  stock?: number;
 }
 
 export const DEPARTMENT_LABELS: Record<Department, string> = {

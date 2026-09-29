@@ -5,15 +5,28 @@ import QuantityStepper from '../components/QuantityStepper';
 import SectionHeading from '../components/SectionHeading';
 import ProductGrid from '../components/ProductGrid';
 import Toast from '../components/Toast';
-import { getProductBySlug, getRelatedProducts } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
 import { DEPARTMENT_LABELS, SIZE_LABELS } from '../types/product';
+import type { Product } from '../types/product';
 import { cn, formatPrice } from '../lib/format';
 import { useCart } from '../hooks/useCart';
 
+/** Same-category first, then same department, then anything else. */
+function relatedProducts(all: Product[], product: Product, limit = 4): Product[] {
+  const rest = all.filter((candidate) => candidate.slug !== product.slug);
+  const score = (candidate: Product) => {
+    if (candidate.category === product.category) return 0;
+    if (candidate.department === product.department) return 1;
+    return 2;
+  };
+  return [...rest].sort((a, b) => score(a) - score(b)).slice(0, limit);
+}
+
 export default function ProductDetails() {
   const { slug } = useParams<{ slug: string }>();
+  const { products, getProductBySlug, loading } = useCatalog();
   const product = slug ? getProductBySlug(slug) : undefined;
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
 
   const [size, setSize] = useState<string | null>(null);
   const [colorIndex, setColorIndex] = useState(0);
@@ -29,9 +42,16 @@ export default function ProductDetails() {
     setError(false);
   }, [slug]);
 
-  const related = useMemo(() => (product ? getRelatedProducts(product, 4) : []), [product]);
+  const related = useMemo(
+    () => (product ? relatedProducts(products, product, 4) : []),
+    [products, product],
+  );
 
+  // Wait for the catalogue before deciding a slug is unknown.
   if (!product) {
+    if (loading) {
+      return <div className="container-site py-32 text-center text-sm text-ink/50">Loading…</div>;
+    }
     return <Navigate to="/shop" replace />;
   }
 
@@ -41,14 +61,34 @@ export default function ProductDetails() {
   const needsSizeChoice = product.sizes.length > 1;
   const resolvedSize = needsSizeChoice ? size : product.sizes[0];
 
+  const tracked = typeof product.stock === 'number';
+  const stock = product.stock ?? Number.POSITIVE_INFINITY;
+  const outOfStock = tracked && stock <= 0;
+
+  // How many of this product are already in the cart across all sizes.
+  const inCart = items
+    .filter((item) => item.slug === product.slug)
+    .reduce((sum, item) => sum + item.quantity, 0);
+  const remaining = Math.max(stock - inCart, 0);
+  const maxQuantity = tracked ? Math.max(Math.min(remaining, 10), 1) : 10;
+
   function handleAddToCart() {
-    if (!product) return;
+    if (!product || outOfStock) return;
     if (!resolvedSize) {
       setError(true);
       return;
     }
-    addItem({ product, size: resolvedSize, color: selectedColor.name, quantity });
-    setToast(`${product.name} added to your cart`);
+    const result = addItem({ product, size: resolvedSize, color: selectedColor.name, quantity });
+
+    if (result.added <= 0) {
+      setToast(`No more stock available for ${product.name}.`);
+      return;
+    }
+    setToast(
+      result.clamped
+        ? `Only ${result.added} added — that is all we have left.`
+        : `${product.name} added to your cart`,
+    );
   }
 
   const detailSections = [
@@ -57,8 +97,7 @@ export default function ProductDetails() {
     { title: 'Care Instructions', body: product.care },
     {
       title: 'Shipping Information',
-      body:
-        'Dispatched within 2 business days. Free delivery on orders over INR 4,999, INR 199 otherwise. Returns accepted within 30 days if the item is unused and in its original packaging.',
+      body: 'Dispatched within 2 business days. We confirm every order by phone before dispatch. Returns accepted within 30 days if the item is unused and in its original packaging.',
     },
   ];
 
@@ -92,10 +131,20 @@ export default function ProductDetails() {
           <p className="eyebrow mb-3">{DEPARTMENT_LABELS[product.department]}</p>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{product.name}</h1>
           <p className="mt-3 text-lg">{formatPrice(product.price)}</p>
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-ink/65">
-            {product.description}
-          </p>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-ink/65">{product.description}</p>
 
+          {outOfStock ? (
+            <p className="mt-6 inline-block border border-brand/30 bg-brand/5 px-4 py-2.5 text-sm text-brand">
+              Out of stock — please call the shop to check when it is back.
+            </p>
+          ) : (
+            tracked &&
+            stock <= 5 && (
+              <p className="mt-6 text-sm text-brand">Only {stock} left in stock.</p>
+            )
+          )}
+
+          {/* Colour */}
           <div className="mt-9">
             <p className="field-label">
               Colour: <span className="text-ink">{selectedColor.name}</span>
@@ -122,6 +171,7 @@ export default function ProductDetails() {
             </div>
           </div>
 
+          {/* Size */}
           {needsSizeChoice ? (
             <div className="mt-8">
               <p className="field-label">{SIZE_LABELS[product.department]}</p>
@@ -130,13 +180,14 @@ export default function ProductDetails() {
                   <button
                     key={value}
                     type="button"
+                    disabled={outOfStock}
                     onClick={() => {
                       setSize(value);
                       setError(false);
                     }}
                     aria-pressed={size === value}
                     className={cn(
-                      'h-11 min-w-[3rem] border px-3 text-sm transition-colors',
+                      'h-11 min-w-[3rem] border px-3 text-sm transition-colors disabled:opacity-40',
                       size === value
                         ? 'border-brand bg-brand text-cream'
                         : 'border-ink/15 text-ink hover:border-brand',
@@ -159,19 +210,26 @@ export default function ProductDetails() {
             </div>
           )}
 
+          {/* Quantity */}
           <div className="mt-8">
             <p className="field-label">Quantity</p>
-            <QuantityStepper value={quantity} onChange={setQuantity} />
+            <QuantityStepper
+              value={quantity}
+              onChange={setQuantity}
+              max={maxQuantity}
+            />
           </div>
 
           <button
             type="button"
             onClick={handleAddToCart}
+            disabled={outOfStock}
             className="btn-primary mt-9 w-full sm:w-auto sm:min-w-[16rem]"
           >
-            Add to Cart
+            {outOfStock ? 'Out of Stock' : 'Add to Cart'}
           </button>
 
+          {/* Details */}
           <dl className="mt-12 border-t border-ink/10">
             {detailSections.map((section) => (
               <div key={section.title} className="border-b border-ink/10 py-5">
