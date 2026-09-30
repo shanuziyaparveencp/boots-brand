@@ -2,8 +2,12 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2023"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+
+    // Matches how Vercel compiles functions in /api. Using "bundler" here
+    // hid missing .js extensions locally that then failed the Vercel build.
+    "module": "node16",
+    "moduleResolution": "node16",
+
     "types": ["node"],
     "skipLibCheck": true,
 

@@ -1,4 +1,4 @@
-import type { ValidatedItem } from './orders';
+import type { ValidatedItem } from './orders.js';
 
 interface NotificationInput {
   orderNumber: string;

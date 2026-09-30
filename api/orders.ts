@@ -7,9 +7,9 @@ import {
   parseItems,
   round2,
   validateAndPrice,
-} from './_lib/orders';
-import type { ProductRecord } from './_lib/orders';
-import { sendAdminNotification } from './_lib/email';
+} from './_lib/orders.js';
+import type { ProductRecord } from './_lib/orders.js';
+import { sendAdminNotification } from './_lib/email.js';
 
 /**
  * POST /api/orders - creates an order.
