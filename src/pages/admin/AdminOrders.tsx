@@ -5,7 +5,24 @@ import { requireSupabase } from '../../lib/supabase';
 import { formatPrice } from '../../lib/format';
 import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../types/order';
 import type { Order, OrderStatus, PaymentStatus } from '../../types/order';
-import { OrderStatusBadge, PaymentStatusBadge } from '../../components/admin/StatusBadge';
+import InlineStatusSelect from '../../components/admin/InlineStatusSelect';
+
+// Same colouring as the read-only badges, reused by the inline dropdowns.
+const ORDER_TONES: Record<OrderStatus, string> = {
+  NEW: 'bg-brand text-cream',
+  CONFIRMED: 'bg-clay text-cream',
+  PACKED: 'bg-beige text-ink',
+  SHIPPED: 'bg-stone text-cream',
+  DELIVERED: 'bg-ink text-cream',
+  CANCELLED: 'bg-sand text-ink/50',
+};
+
+const PAYMENT_TONES: Record<PaymentStatus, string> = {
+  PENDING: 'border border-ink/25 text-ink/60 bg-transparent',
+  PAID: 'border border-ink/60 text-ink bg-transparent',
+  FAILED: 'border border-brand/50 text-brand bg-transparent',
+  REFUNDED: 'border border-ink/25 text-ink/50 bg-transparent',
+};
 
 const PAGE_SIZE = 50;
 
@@ -50,6 +67,23 @@ export default function AdminOrders() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  /** Persists a status change made from the list and updates the row in place. */
+  const updateField = useCallback(
+    async (id: string, field: 'order_status' | 'payment_status', value: string) => {
+      const { error: updateError } = await requireSupabase()
+        .from('orders')
+        .update({ [field]: value })
+        .eq('id', id);
+
+      if (updateError) throw new Error(updateError.message);
+
+      setOrders((current) =>
+        current.map((order) => (order.id === id ? { ...order, [field]: value } : order)),
+      );
+    },
+    [],
+  );
 
   // Filtering happens in the browser: a small shop's recent orders easily fit
   // in one page, and it keeps search instant.
@@ -205,10 +239,22 @@ export default function AdminOrders() {
                       {formatPrice(Number(order.total_amount))}
                     </td>
                     <td className="py-4 pr-4">
-                      <PaymentStatusBadge status={order.payment_status} />
+                      <InlineStatusSelect
+                        value={order.payment_status}
+                        options={PAYMENT_STATUSES}
+                        tones={PAYMENT_TONES}
+                        label={`Payment status for ${order.order_number}`}
+                        onChange={(next) => updateField(order.id, 'payment_status', next)}
+                      />
                     </td>
                     <td className="py-4">
-                      <OrderStatusBadge status={order.order_status} />
+                      <InlineStatusSelect
+                        value={order.order_status}
+                        options={ORDER_STATUSES}
+                        tones={ORDER_TONES}
+                        label={`Order status for ${order.order_number}`}
+                        onChange={(next) => updateField(order.id, 'order_status', next)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -233,14 +279,25 @@ export default function AdminOrders() {
                       {formatPrice(Number(order.total_amount))}
                     </span>
                   </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <OrderStatusBadge status={order.order_status} />
-                    <PaymentStatusBadge status={order.payment_status} />
-                    <span className="ml-auto text-xs text-ink/50">
-                      {formatDate(order.created_at)}
-                    </span>
-                  </div>
+                  <p className="mt-2 text-xs text-ink/50">{formatDate(order.created_at)}</p>
                 </Link>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ink/10 pt-3">
+                  <InlineStatusSelect
+                    value={order.order_status}
+                    options={ORDER_STATUSES}
+                    tones={ORDER_TONES}
+                    label={`Order status for ${order.order_number}`}
+                    onChange={(next) => updateField(order.id, 'order_status', next)}
+                  />
+                  <InlineStatusSelect
+                    value={order.payment_status}
+                    options={PAYMENT_STATUSES}
+                    tones={PAYMENT_TONES}
+                    label={`Payment status for ${order.order_number}`}
+                    onChange={(next) => updateField(order.id, 'payment_status', next)}
+                  />
+                </div>
               </li>
             ))}
           </ul>

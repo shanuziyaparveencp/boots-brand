@@ -27,7 +27,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span className="shrink-0 text-sm text-ink">{formatPrice(product.price)}</span>
           </div>
           <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink/55">
-            {product.description}
+            {product.shortDescription || product.description}
           </p>
           <span className="mt-3 inline-block border-b border-ink/30 pb-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors group-hover:border-ink">
             View Product

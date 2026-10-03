@@ -29,6 +29,8 @@ export interface Product {
   name: string;
   slug: string;
   description: string;
+  /** One-line summary for product cards. Falls back to description when empty. */
+  shortDescription?: string;
   /** Price in Indian rupees. */
   price: number;
   department: Department;

@@ -45,8 +45,16 @@ if (!connectionString) {
 
 const which = process.argv[2];
 const files = [];
-if (!which || which === 'schema') files.push('supabase/schema.sql');
-if (!which || which === 'seed') files.push('supabase/seed.sql');
+if (!which) {
+  files.push('supabase/schema.sql', 'supabase/seed.sql');
+} else if (which === 'schema') {
+  files.push('supabase/schema.sql');
+} else if (which === 'seed') {
+  files.push('supabase/seed.sql');
+} else {
+  // Any explicit path, e.g. supabase/migrations/001_product_management.sql
+  files.push(which);
+}
 
 const client = new pg.Client({
   connectionString,

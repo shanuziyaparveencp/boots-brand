@@ -12,6 +12,7 @@ export interface ProductRow {
   name: string;
   slug: string;
   description: string;
+  short_description: string | null;
   price: number | string;
   images: string[] | null;
   sizes: string[] | null;
@@ -28,7 +29,7 @@ export interface ProductRow {
 
 /** Columns the storefront needs; keeps the select list in one place. */
 export const PRODUCT_COLUMNS =
-  'id, name, slug, description, price, images, sizes, category, stock, is_active, department, gender, colors, material, care, featured';
+  'id, name, slug, description, short_description, price, images, sizes, category, stock, is_active, department, gender, colors, material, care, featured';
 
 export function mapProductRow(row: ProductRow): Product {
   return {
@@ -36,6 +37,7 @@ export function mapProductRow(row: ProductRow): Product {
     name: row.name,
     slug: row.slug,
     description: row.description,
+    shortDescription: row.short_description ?? undefined,
     price: Number(row.price),
     department: row.department as Department,
     category: row.category as ProductCategory,

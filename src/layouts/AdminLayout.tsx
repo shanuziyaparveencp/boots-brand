@@ -34,18 +34,24 @@ export default function AdminLayout() {
                 className="h-8 w-auto"
               />
             </Link>
-            <nav aria-label="Admin">
-              <NavLink
-                to="/admin/orders"
-                className={({ isActive }) =>
-                  cn(
-                    'text-sm transition-colors hover:text-cream',
-                    isActive ? 'text-cream' : 'text-cream/70',
-                  )
-                }
-              >
-                Orders
-              </NavLink>
+            <nav aria-label="Admin" className="flex items-center gap-6">
+              {[
+                { to: '/admin/orders', label: 'Orders' },
+                { to: '/admin/products', label: 'Products' },
+              ].map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    cn(
+                      'text-sm transition-colors hover:text-cream',
+                      isActive ? 'text-cream' : 'text-cream/70',
+                    )
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
             </nav>
           </div>
 
