@@ -9,6 +9,7 @@ import Contact from './pages/Contact';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
+import TrackOrder from './pages/TrackOrder';
 import NotFound from './pages/NotFound';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -37,6 +38,9 @@ export default function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order/:orderNumber" element={<OrderConfirmation />} />
+        <Route path="/track" element={<TrackOrder />} />
+        {/* "My orders" is the phrase customers look for. */}
+        <Route path="/orders" element={<Navigate to="/track" replace />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

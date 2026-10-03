@@ -48,6 +48,12 @@ export interface Order {
   payment_status: PaymentStatus;
   order_status: OrderStatus;
 
+  /** Captured when staff mark the order paid. Internal fields are admin-only. */
+  payment_reference: string | null;
+  payment_method: string | null;
+  payment_note: string | null;
+  paid_at: string | null;
+
   created_at: string;
   updated_at: string;
 }

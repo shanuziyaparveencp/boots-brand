@@ -165,6 +165,13 @@ export default function OrderConfirmation() {
             <Link to="/shop" className="btn-primary mt-6 w-full">
               Continue Shopping
             </Link>
+
+            <Link
+              to={`/track?order=${order.order_number}`}
+              className="mt-4 block text-center text-xs uppercase tracking-[0.14em] text-ink/60 transition-colors hover:text-ink"
+            >
+              Track This Order
+            </Link>
           </div>
         </aside>
       </div>

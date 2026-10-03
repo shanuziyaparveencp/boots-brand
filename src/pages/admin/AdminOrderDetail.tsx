@@ -7,6 +7,8 @@ import { ONE_SIZE } from '../../types/product';
 import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../types/order';
 import type { OrderStatus, OrderWithItems, PaymentStatus } from '../../types/order';
 import { OrderStatusBadge, PaymentStatusBadge } from '../../components/admin/StatusBadge';
+import PaymentDetailsDialog from '../../components/admin/PaymentDetailsDialog';
+import type { PaymentDetails } from '../../components/admin/PaymentDetailsDialog';
 import { cn } from '../../lib/format';
 
 export default function AdminOrderDetail() {
@@ -17,6 +19,8 @@ export default function AdminOrderDetail() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<'order' | 'payment' | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  const [paymentDialog, setPaymentDialog] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -42,22 +46,21 @@ export default function AdminOrderDetail() {
     void load();
   }, [load]);
 
-  async function updateStatus(
-    field: 'order_status' | 'payment_status',
-    value: OrderStatus | PaymentStatus,
-  ) {
-    if (!order) return;
-    const which = field === 'order_status' ? 'order' : 'payment';
+  async function applyPatch(
+    which: 'order' | 'payment',
+    patch: Record<string, string | null>,
+  ): Promise<boolean> {
+    if (!order) return false;
     setSaving(which);
     setError(null);
 
     const previous = order;
     // Optimistic: the select reflects the change immediately.
-    setOrder({ ...order, [field]: value } as OrderWithItems);
+    setOrder({ ...order, ...patch } as OrderWithItems);
 
     const { error: updateError } = await requireSupabase()
       .from('orders')
-      .update({ [field]: value })
+      .update(patch)
       .eq('id', order.id);
 
     setSaving(null);
@@ -65,11 +68,39 @@ export default function AdminOrderDetail() {
     if (updateError) {
       setOrder(previous);
       setError('Could not save the change. Please try again.');
-      return;
+      return false;
     }
 
+    // Re-read so trigger-managed fields such as paid_at show the stored value.
+    void load();
     setSaved(which);
     window.setTimeout(() => setSaved(null), 2500);
+    return true;
+  }
+
+  async function updateOrderStatus(value: OrderStatus) {
+    await applyPatch('order', { order_status: value });
+  }
+
+  /** Moving to PAID collects the transaction details first. */
+  async function updatePaymentStatus(value: PaymentStatus) {
+    if (value === 'PAID') {
+      setPaymentDialog(true);
+      return;
+    }
+    await applyPatch('payment', {
+      payment_status: value,
+      payment_reference: null,
+      payment_method: null,
+      payment_note: null,
+    });
+  }
+
+  async function confirmPayment(details: PaymentDetails) {
+    setPaymentError(null);
+    const ok = await applyPatch('payment', { payment_status: 'PAID', ...details });
+    if (ok) setPaymentDialog(false);
+    else setPaymentError('Could not save the payment. Please try again.');
   }
 
   if (loading) {
@@ -151,7 +182,7 @@ export default function AdminOrderDetail() {
                   id="order-status"
                   value={order.order_status}
                   disabled={saving !== null}
-                  onChange={(e) => void updateStatus('order_status', e.target.value as OrderStatus)}
+                  onChange={(e) => void updateOrderStatus(e.target.value as OrderStatus)}
                   className={cn(
                     'w-full border border-ink/15 bg-white px-3 py-2.5 text-sm',
                     'focus:border-brand focus:outline-none disabled:opacity-50',
@@ -181,9 +212,7 @@ export default function AdminOrderDetail() {
                   id="payment-status-select"
                   value={order.payment_status}
                   disabled={saving !== null}
-                  onChange={(e) =>
-                    void updateStatus('payment_status', e.target.value as PaymentStatus)
-                  }
+                  onChange={(e) => void updatePaymentStatus(e.target.value as PaymentStatus)}
                   className={cn(
                     'w-full border border-ink/15 bg-white px-3 py-2.5 text-sm',
                     'focus:border-brand focus:outline-none disabled:opacity-50',
@@ -198,6 +227,49 @@ export default function AdminOrderDetail() {
               </div>
             </div>
           </section>
+
+          {/* Recorded payment */}
+          {order.payment_status === 'PAID' && (
+            <section className="mt-6 border border-ink/10 p-5">
+              <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em]">
+                Payment received
+              </h2>
+              <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <dt className="text-xs text-ink/50">Method</dt>
+                  <dd className="mt-1 text-sm">{order.payment_method || '—'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-ink/50">Transaction reference</dt>
+                  <dd className="mt-1 break-all text-sm font-medium">
+                    {order.payment_reference || '—'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-ink/50">Recorded</dt>
+                  <dd className="mt-1 text-sm">
+                    {order.paid_at
+                      ? new Date(order.paid_at).toLocaleString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : '—'}
+                  </dd>
+                </div>
+                {order.payment_note && (
+                  <div className="sm:col-span-2">
+                    <dt className="text-xs text-ink/50">Note</dt>
+                    <dd className="mt-1 whitespace-pre-line text-sm text-ink/70">
+                      {order.payment_note}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+          )}
 
           {/* Items */}
           <section className="mt-10">
@@ -299,6 +371,19 @@ export default function AdminOrderDetail() {
           </div>
         </aside>
       </div>
+
+      <PaymentDetailsDialog
+        open={paymentDialog}
+        orderNumber={order.order_number}
+        amount={Number(order.total_amount)}
+        busy={saving === 'payment'}
+        error={paymentError}
+        onConfirm={(details) => void confirmPayment(details)}
+        onCancel={() => {
+          setPaymentDialog(false);
+          setPaymentError(null);
+        }}
+      />
     </div>
   );
 }

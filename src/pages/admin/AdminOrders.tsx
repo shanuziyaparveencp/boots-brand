@@ -6,6 +6,8 @@ import { formatPrice } from '../../lib/format';
 import { ORDER_STATUSES, PAYMENT_STATUSES } from '../../types/order';
 import type { Order, OrderStatus, PaymentStatus } from '../../types/order';
 import InlineStatusSelect from '../../components/admin/InlineStatusSelect';
+import PaymentDetailsDialog from '../../components/admin/PaymentDetailsDialog';
+import type { PaymentDetails } from '../../components/admin/PaymentDetailsDialog';
 
 // Same colouring as the read-only badges, reused by the inline dropdowns.
 const ORDER_TONES: Record<OrderStatus, string> = {
@@ -45,6 +47,11 @@ export default function AdminOrders() {
   const [orderStatus, setOrderStatus] = useState<OrderStatus | 'ALL'>('ALL');
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | 'ALL'>('ALL');
 
+  // Order awaiting payment details before it can be marked paid.
+  const [paymentFor, setPaymentFor] = useState<Order | null>(null);
+  const [paymentSaving, setPaymentSaving] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -70,20 +77,53 @@ export default function AdminOrders() {
 
   /** Persists a status change made from the list and updates the row in place. */
   const updateField = useCallback(
-    async (id: string, field: 'order_status' | 'payment_status', value: string) => {
+    async (id: string, patch: Record<string, string | null>) => {
       const { error: updateError } = await requireSupabase()
         .from('orders')
-        .update({ [field]: value })
+        .update(patch)
         .eq('id', id);
 
       if (updateError) throw new Error(updateError.message);
 
       setOrders((current) =>
-        current.map((order) => (order.id === id ? { ...order, [field]: value } : order)),
+        current.map((order) => (order.id === id ? { ...order, ...patch } : order)),
       );
     },
     [],
   );
+
+  /**
+   * Marking an order paid has to capture how the money arrived, so that one
+   * transition opens a dialog instead of saving straight away.
+   */
+  async function handlePaymentChange(order: Order, next: PaymentStatus) {
+    if (next === 'PAID') {
+      setPaymentFor(order);
+      return;
+    }
+    // Leaving PAID clears the recorded transaction; paid_at is cleared by a
+    // database trigger.
+    await updateField(order.id, {
+      payment_status: next,
+      payment_reference: null,
+      payment_method: null,
+      payment_note: null,
+    });
+  }
+
+  async function confirmPayment(details: PaymentDetails) {
+    if (!paymentFor) return;
+    setPaymentSaving(true);
+    setPaymentError(null);
+    try {
+      await updateField(paymentFor.id, { payment_status: 'PAID', ...details });
+      setPaymentFor(null);
+    } catch {
+      setPaymentError('Could not save the payment. Please try again.');
+    } finally {
+      setPaymentSaving(false);
+    }
+  }
 
   // Filtering happens in the browser: a small shop's recent orders easily fit
   // in one page, and it keeps search instant.
@@ -244,7 +284,7 @@ export default function AdminOrders() {
                         options={PAYMENT_STATUSES}
                         tones={PAYMENT_TONES}
                         label={`Payment status for ${order.order_number}`}
-                        onChange={(next) => updateField(order.id, 'payment_status', next)}
+                        onChange={(next) => handlePaymentChange(order, next)}
                       />
                     </td>
                     <td className="py-4">
@@ -253,7 +293,7 @@ export default function AdminOrders() {
                         options={ORDER_STATUSES}
                         tones={ORDER_TONES}
                         label={`Order status for ${order.order_number}`}
-                        onChange={(next) => updateField(order.id, 'order_status', next)}
+                        onChange={(next) => updateField(order.id, { order_status: next })}
                       />
                     </td>
                   </tr>
@@ -288,14 +328,14 @@ export default function AdminOrders() {
                     options={ORDER_STATUSES}
                     tones={ORDER_TONES}
                     label={`Order status for ${order.order_number}`}
-                    onChange={(next) => updateField(order.id, 'order_status', next)}
+                    onChange={(next) => updateField(order.id, { order_status: next })}
                   />
                   <InlineStatusSelect
                     value={order.payment_status}
                     options={PAYMENT_STATUSES}
                     tones={PAYMENT_TONES}
                     label={`Payment status for ${order.order_number}`}
-                    onChange={(next) => updateField(order.id, 'payment_status', next)}
+                    onChange={(next) => handlePaymentChange(order, next)}
                   />
                 </div>
               </li>
@@ -303,6 +343,19 @@ export default function AdminOrders() {
           </ul>
         </>
       )}
+
+      <PaymentDetailsDialog
+        open={paymentFor !== null}
+        orderNumber={paymentFor?.order_number ?? ''}
+        amount={Number(paymentFor?.total_amount ?? 0)}
+        busy={paymentSaving}
+        error={paymentError}
+        onConfirm={(details) => void confirmPayment(details)}
+        onCancel={() => {
+          setPaymentFor(null);
+          setPaymentError(null);
+        }}
+      />
     </div>
   );
 }

@@ -16,6 +16,7 @@ const departmentLinks = [
 ];
 
 const supportLinks = [
+  { to: '/track', label: 'Track Order' },
   { to: '/contact', label: 'Shipping' },
   { to: '/contact', label: 'Returns' },
   { to: '/contact', label: 'Contact' },
